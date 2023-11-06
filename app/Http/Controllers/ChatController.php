@@ -22,7 +22,7 @@ class ChatController extends Controller
             'prompt' => $prompt,
             'max_tokens' => 150, // Adjust the max tokens as needed
             'temperature' => 0.7, // Adjust the temperature as needed
-        ])->header('Authorization', 'Bearer ' . env('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'));
+        ])->header('Authorization', 'Bearer ' . env(''));
 
         $responseData = $response->json();
 
@@ -46,7 +46,6 @@ class ChatController extends Controller
             $chatAnswer = new ChatAnswer();
             $chatAnswer->chatAnswer = $correctedAnswer;
             $chatAnswer->save();
-
         }
     }
 }

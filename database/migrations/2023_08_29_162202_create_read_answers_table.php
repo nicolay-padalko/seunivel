@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('read_answers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('answer_id');
-            $table->String('answer');
+            $table->integer('r_answer_id');
+            $table->String('r_answer');
             $table->timestamps();
         });
     }

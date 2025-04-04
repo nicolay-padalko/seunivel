@@ -43,8 +43,13 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function answers()
-    {
-        return $this->hasMany(Answer::class, 'user_id');
-    }
+    // public function multipleOptions()
+    // {
+    //     return $this->hasMany(MultipleOption::class, 'user_id');
+    // }
+
+    // public function reading()
+    // {
+    //     return $this->hasMany(Reading::class, 'user_id');
+    // }
 }

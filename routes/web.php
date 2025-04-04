@@ -1,9 +1,12 @@
 <?php
 
-use App\Http\Controllers\AnswerController;
-use App\Http\Controllers\ChatController;
-use App\Http\Controllers\PerguntaController;
+use App\Http\Controllers\ReadController;
+use App\Http\Controllers\WriteController;
+use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MultipleOptionController;
+use App\Http\Controllers\EmailController;
+use App\Models\MultipleOption;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,9 +34,9 @@ Route::get('/', function () {
 //Route::get('/question', function () {
 //    return Inertia::render('Frontend/Question');
 //});
-Route::get('/question', [PerguntaController::class, 'csvArray']);
+Route::get('/question', [QuestionController::class, 'csvArray']);
 
-Route::get('/email', [PerguntaController::class, 'answer']);
+Route::get('/write', [QuestionController::class, 'write']);
 
 Route::get('/start', function () {
     return Inertia::render('Frontend/StartTest');
@@ -41,10 +44,14 @@ Route::get('/start', function () {
 
 
 Route::get('/users', 'UserController@readCsv');
-Route::get('/reading', [PerguntaController::class, 'interpretation'])->name('reading')->middleware('auth');
+Route::get('/reading', [QuestionController::class, 'interpretation'])->name('reading')->middleware('auth');
+// Route::get('/finish', [WriteController::class, 'writeFinish'])->name('finish')->middleware('auth');
 
-Route::post('/answer', [AnswerController::class, 'store'])->name('answer')->middleware('auth');
-Route::post('/emailanswer', [ChatController::class, 'chat'])->name('emailanswer');
+Route::get('/finish', [EmailController::class, 'sendAnswerEmail']);
+
+Route::post('/answer', [MultipleOptionController::class, 'store'])->name('answer')->middleware('auth');
+Route::post('/readAnswer', [ReadController::class, 'store'])->name('readAnswer')->middleware('auth');
+Route::post('/writeAnswer', [WriteController::class, 'writeText'])->name('writeAnswer');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

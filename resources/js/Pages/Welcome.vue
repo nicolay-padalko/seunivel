@@ -62,7 +62,7 @@ const registerUser = () => {
                 <a href="/register">
                     <button
                         class="bg-blue-500 p-3 font-medium rounded-lg text-center w-72">
-                        Inciar
+                        Iniciar
                     </button>
                 </a>
 

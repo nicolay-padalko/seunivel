@@ -5,7 +5,7 @@
         </div>
         <div class="flex flex-row justify-end pr-20">
             <div>
-                <Timer/>
+                <Timer />
             </div>
         </div>
     </div>
@@ -20,7 +20,7 @@
             </h1>
             <div class="pt-4 pl-12 pr-12">
                 <div class="bg-gray-400 rounded-full h-3.5 dark:bg-gray-600 ">
-                    <div class="bg-green-500 h-3.5 rounded-full" :style="{width: totalProgress + '%'}"></div>
+                    <div class="bg-green-500 h-3.5 rounded-full" :style="{ width: totalProgress + '%' }"></div>
                 </div>
             </div>
         </div>
@@ -31,7 +31,7 @@
             <div class="pt-4 pl-12 pr-12">
                 <div class="bg-gray-400 rounded-full h-3.5 dark:bg-gray-600">
                     <div class="w-">
-                        <div class="bg-green-500 h-3.5 rounded-full" :style="{width: progress + '%'}"></div>
+                        <div class="bg-green-500 h-3.5 rounded-full" :style="{ width: progress + '%' }"></div>
                     </div>
                 </div>
             </div>
@@ -45,46 +45,32 @@
                     <div class="w-full max-w-3xl ">
                         <form @submit.prevent="submit">
 
-                            <Question
-                                :question="count"
-                                :pergunta="csv[count][0]"
-                            />
+                            <Question :question="count" :pergunta="csv[count][0]" />
 
-                            <AnswerOption name="A" id="A"
-                                          :value="csv[count][1]"
-                                          :selected="selected"
-                                          @update:selected="selected = $event"/>
+                            <AnswerOption name="A" id="A" :value="csv[count][1]" :selected="selected"
+                                @update:selected="selected = $event" />
 
-                            <AnswerOption name="B" id="B"
-                                          :value="csv[count][2]"
-                                          :selected="selected"
-                                          @update:selected="selected = $event"/>
+                            <AnswerOption name="B" id="B" :value="csv[count][2]" :selected="selected"
+                                @update:selected="selected = $event" />
 
-                            <AnswerOption name="C" id="C"
-                                          :value="csv[count][3]"
-                                          :selected="selected"
-                                          @update:selected="selected = $event"/>
+                            <AnswerOption name="C" id="C" :value="csv[count][3]" :selected="selected"
+                                @update:selected="selected = $event" />
 
-                            <AnswerOption name="D" id="D"
-                                          :value="csv[count][4]"
-                                          :selected="selected"
-                                          @update:selected="selected = $event"/>
+                            <AnswerOption name="D" id="D" :value="csv[count][4]" :selected="selected"
+                                @update:selected="selected = $event" />
 
 
-                            <div  class="flex flex-col justify-center pt-6 pl-24 pr-24">
-                                <a v-if=" textButton  === 'Finish'" href="/reading">
-                                    <button
-                                            class="bg-blue-500 p-3 font-medium rounded-lg text-center">
-                                        {{ textButton }}
-                                    </button>
-                                </a>
-                                <button v-else  @click="changeQuestion"
-                                        class="bg-blue-500 p-3 font-medium rounded-lg text-center">
+                            <div class="flex flex-col justify-center pt-6 pl-24 pr-24">
+                                <button v-if="textButton === 'Finish'" @click="finishTest"
+                                    class="bg-blue-500 p-3 font-medium rounded-lg text-center">
+                                    {{ textButton }}
+                                </button> 
+                                <button v-else @click="changeQuestion"
+                                    class="bg-blue-500 p-3 font-medium rounded-lg text-center">
                                     {{ textButton }}
                                 </button>
                             </div>
                         </form>
-                        <!--                        <span>Seleção: {{ selected }}</span>-->
                     </div>
                 </div>
             </div>
@@ -97,9 +83,9 @@
 <script setup>
 import Timer from "@/Pages/Components/Timer.vue";
 import Question from "@/Pages/Frontend/Question.vue";
-import {ref} from "vue";
+import { ref } from "vue";
 import AnswerOption from "@/Pages/Frontend/AnswerOption.vue";
-import {useForm} from "@inertiajs/vue3";
+import { useForm } from "@inertiajs/vue3";
 
 
 const props = defineProps([
@@ -114,28 +100,60 @@ let totalProgress = ref(0)
 let textButton = ref('Next Question')
 
 function changeQuestion() {
-    if (count.value <= 17) {
-        progress = 100 / 17 * count.value
-        let csv = props.csv;
-        let selected = props.selected;
-        if (selected === csv[count.value][5]) {
-            form.answer_id = count.value
-            form.answer = 'correct'
-        } else {
-            form.answer_id = count.value
-            form.answer = 'wrong'
-        }
-        count.value++
+    let csv = props.csv;
+    let selected = props.selected;
+
+    if (selected === csv[count.value][5]) {
+        form.mo_answer_id = count.value;
+        form.mo_answer = 'correct';
+    } else {
+        form.mo_answer_id = count.value;
+        form.mo_answer = 'wrong';
     }
+
+    submit();
+
+    if (count.value < 18) {
+        count.value++;
+        progress.value = (100 / 17) * (count.value - 1);
+    }
+
     if (count.value === 18) {
-        textButton = 'Finish'
-        totalProgress = 33
+        textButton.value = 'Finish';
+        totalProgress.value = 33;
     }
 }
 
+function finishTest() {
+    let csv = props.csv;
+    let selected = props.selected;
+
+    if (selected === csv[count.value][5]) {
+        form.mo_answer_id = count.value;
+        form.mo_answer = 'correct';
+    } else {
+        form.mo_answer_id = count.value;
+        form.mo_answer = 'wrong';
+    }
+    submit();
+
+    if (count.value === 18) {
+        setTimeout(() => {
+            goToReading();
+        }, 500); 
+    }
+}
+
+
+
+function goToReading() {
+    window.location.href = '/reading';
+}
+
 const form = useForm({
-    answer_id: '',
-    answer: '',
+    question_id: '',
+    mo_answer_id: '',
+    mo_answer: '',
     question: '',
 });
 
@@ -144,6 +162,3 @@ const submit = () => {
 };
 
 </script>
-
-
-

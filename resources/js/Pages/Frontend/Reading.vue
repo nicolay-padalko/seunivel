@@ -1,13 +1,16 @@
-
-
 <template>
-    <div class=" pt-6">
+    <div class="grid grid-cols-2  pt-6">
         <div class="pl-12">
-            <h1 class="text-3xl font-medium">Reading</h1>
+            <h1 class="text-3xl font-medium">English Test</h1>
+        </div>
+        <div class="flex flex-row justify-end pr-20">
+            <div>
+                <Timer />
+            </div>
         </div>
     </div>
     <div class="pl-12 pt-8 pb-6">
-        <p>Read the question carefully and choose the best option.</p>
+        <p>Read the text carefully and choose the best option.</p>
     </div>
     <div class="flex flex-col justify-items-center">
         <div class="grid grid-rows-2">
@@ -16,7 +19,7 @@
             </h1>
             <div class="pt-4 pl-12 pr-12">
                 <div class="bg-gray-400 rounded-full h-3.5 dark:bg-gray-600 ">
-                    <div class="bg-green-500 h-3.5 rounded-full" :style="{width: totalProgress + '%'}"></div>
+                    <div class="bg-green-500 h-3.5 rounded-full" :style="{ width: totalProgress + '%' }"></div>
                 </div>
             </div>
         </div>
@@ -27,13 +30,13 @@
             <div class="pt-4 pl-12 pr-12">
                 <div class="bg-gray-400 rounded-full h-3.5 dark:bg-gray-600">
                     <div class="w-">
-                        <div class="bg-green-500 h-3.5 rounded-full" :style="{width: progress + '%'}"></div>
+                        <div class="bg-green-500 h-3.5 rounded-full" :style="{ width: progress + '%' }"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="p-32 pt-16 pb-6">
+    <div class="p-6 lg:pr-16 pl-16 pt-16 pb-6">
         <p> Hi! Sue
 
             I've been meaning to write for ages and finally today I'm actually doing something about it. Not that I'm
@@ -59,30 +62,29 @@
 
         </p>
     </div>
-    <div class="flex flex-col pt-6 justify-center items-center">
-        <div class="w-full max-w-3xl ">
-            <Question
-                :question="count"
-                :pergunta="read[count][0]"
-            />
-            <Answer name="A" id="A"
-                    :value="read[count][1]"
-                    :selected="selected"
-                    @update:selected="selected = $event"/>
-            <Answer name="A" id="A"
-                    :value="read[count][2]"
-                    :selected="selected"
-                    @update:selected="selected = $event"/>
-            <Answer name="A" id="A"
-                    :value="read[count][3]"
-                    :selected="selected"
-                    @update:selected="selected = $event"/>
+    <div class="flex flex-col pt-2 justify-center items-center">
+        <div class="w-full max-w-3xl p-2">
+            <form @submit.prevent="submit">
 
-            <div class="flex flex-col justify-center pb-24 pt-6 pl-24 pr-24">
-                <button @click="changeQuestion" class="bg-blue-500 p-3 font-medium rounded-lg text-center">
-                    {{ textButton }}
-                </button>
-            </div>
+                <Question :question="count" :pergunta="read[count][0]" />
+
+                <Answer name="A" id="A" :value="read[count][1]" :selected="selected"
+                    @update:selected="selected = $event" />
+                <Answer name="B" id="B" :value="read[count][2]" :selected="selected"
+                    @update:selected="selected = $event" />
+                <Answer name="C" id="C" :value="read[count][3]" :selected="selected"
+                    @update:selected="selected = $event" />
+
+                <div class="flex flex-col justify-center pt-6 pl-24 pr-24">
+                    <button v-if="textButton === 'Finish'" @click="finishTest"
+                        class="bg-blue-500 p-3 font-medium rounded-lg text-center">
+                        {{ textButton }}
+                    </button>
+                    <button v-else @click="changeQuestion" class="bg-blue-500 p-3 font-medium rounded-lg text-center">
+                        {{ textButton }}
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -90,12 +92,15 @@
 
 <script setup>
 
-import {ref} from "vue";
+import { ref } from "vue";
+import Timer from "@/Pages/Components/Timer.vue";
 import Question from "@/Pages/Frontend/Question.vue";
 import Answer from "@/Pages/Frontend/AnswerOption.vue";
+import { useForm } from "@inertiajs/vue3";
 
 const props = defineProps([
     'read',
+    'value',
     'selected',
 ])
 
@@ -106,27 +111,64 @@ let textButton = ref('Next Question')
 let totalProgress = ref(33)
 
 function changeQuestion() {
-    if (count.value <= 4) {
-        progress = 100 / 4 * count.value
-        let read = props.read;
-        let selected = props.selected;
-        if (selected === read[count.value][5]) {
-            form.answer_id = count.value
-            form.answer = 'correct'
-        } else {
-            form.answer_id = count.value
-            form.answer = 'wrong'
-        }
-        count.value++
+    let read = props.read;
+    let selected = props.selected;
+
+    if (selected === read[count.value][4]) {
+        form.r_answer_id = count.value;
+        form.r_answer = 'correct';
+    } else {
+        form.r_answer_id = count.value;
+        form.r_answer = 'wrong';
+    }
+
+    submit();
+    
+
+    if (count.value < 5) {
+        count.value++;
+        progress.value = (100 / 5) * (count.value - 1);
     }
     if (count.value === 5) {
-        textButton = 'Finish'
-        totalProgress = 66
+        textButton.value = 'Finish';
+        totalProgress.value = 66;
     }
 }
 
+function finishTest() {
+    let read = props.read;
+    let selected = props.selected;
+
+    if (selected === read[count.value][4]) {
+        form.r_answer_id = count.value;
+        form.r_answer = 'correct';
+    } else {
+        form.r_answer_id = count.value;
+        form.r_answer = 'wrong';
+    }
+    submit();
+
+    setTimeout(() => {
+        goToEmail();
+    }, 500); 
+}
+
+function goToEmail() {
+    // window.location.href = '/write';
+    window.location.href = '/finish';
+}
+
+const form = useForm({
+    question_id: '',
+    r_answer_id: '',
+    r_answer: '',
+    question: '',
+});
+
+const submit = () => {
+    form.post(route('readAnswer'))
+};
+
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
